@@ -68,6 +68,32 @@ namespace MilesCarRental.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "VehiclesLocation",
+                columns: table => new
+                {
+                    VehicleLocationId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    LocationId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    VehicleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VehiclesLocation", x => x.VehicleLocationId);
+                    table.ForeignKey(
+                        name: "FK_VehiclesLocation_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "LocationId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VehiclesLocation_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "VehicleId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.InsertData(
                 table: "Locations",
                 columns: new[] { "LocationId", "IsDestination", "IsOrigin", "LocationName", "Registration" },
@@ -86,16 +112,34 @@ namespace MilesCarRental.Migrations
                     { new Guid("b1820ce5-f0a1-4923-b362-b10ebddc7ad4"), true, 1, 1, "Manual", 5, "Suzuki Swift" },
                     { new Guid("d70f3c46-0055-4b30-946a-98486ec75993"), true, 3, 0, "Automática", 5, "Renault Koleos" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "VehiclesLocation",
+                columns: new[] { "VehicleLocationId", "LocationId", "VehicleId" },
+                values: new object[] { new Guid("ecefad67-95ed-4323-bb9b-96c0a0305027"), new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"), new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490") });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VehiclesLocation_LocationId",
+                table: "VehiclesLocation",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VehiclesLocation_VehicleId",
+                table: "VehiclesLocation",
+                column: "VehicleId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Locations");
+                name: "Logs");
 
             migrationBuilder.DropTable(
-                name: "Logs");
+                name: "VehiclesLocation");
+
+            migrationBuilder.DropTable(
+                name: "Locations");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");

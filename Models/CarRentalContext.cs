@@ -9,6 +9,7 @@ namespace DataAccess
         public DbSet<VehicleEntity> Vehicles { get; set; }
         public DbSet<LocationEntity> Locations { get; set; }
         public DbSet<LogEntity> Logs { get; set; }
+        public DbSet<VehicleLocationEntity> VehiclesLocation { get; set; }
 
         public CarRentalContext(DbContextOptions<CarRentalContext> options) : base(options) { }
 
@@ -92,6 +93,15 @@ namespace DataAccess
                 {
                     LocationId = new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"),
                     LocationName = "location"
+                }
+                );
+
+            modelBuilder.Entity<VehicleLocationEntity>().HasData(
+                new VehicleLocationEntity
+                { 
+                    VehicleLocationId = new Guid("ecefad67-95ed-4323-bb9b-96c0a0305027"),
+                    LocationId = new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"),
+                    VehicleId = new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490")
                 }
                 );
         }

@@ -11,8 +11,10 @@ namespace Entities
     {
         [Key]
         public Guid LogId { get; set; }
+
         [StringLength(50)]
         public bool LocationOrigin { get; set; }
+
         [StringLength(50)]
         public bool LocationDestination { get; set; }
         public DateTime Registration { get; set; }

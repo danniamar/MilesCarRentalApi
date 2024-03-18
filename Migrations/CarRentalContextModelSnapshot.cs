@@ -180,6 +180,64 @@ namespace MilesCarRental.Migrations
                             VehicleName = "Hyundai Creta"
                         });
                 });
+
+            modelBuilder.Entity("MilesCarRental.Models.VehicleLocationEntity", b =>
+                {
+                    b.Property<Guid>("VehicleLocationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("VehicleLocationId");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehiclesLocation");
+
+                    b.HasData(
+                        new
+                        {
+                            VehicleLocationId = new Guid("ecefad67-95ed-4323-bb9b-96c0a0305027"),
+                            LocationId = new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"),
+                            VehicleId = new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490")
+                        });
+                });
+
+            modelBuilder.Entity("MilesCarRental.Models.VehicleLocationEntity", b =>
+                {
+                    b.HasOne("Entities.LocationEntity", "Location")
+                        .WithMany("VehiclesLocation")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entities.VehicleEntity", "Vehicle")
+                        .WithMany("VehiclesLocation")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("Entities.LocationEntity", b =>
+                {
+                    b.Navigation("VehiclesLocation");
+                });
+
+            modelBuilder.Entity("Entities.VehicleEntity", b =>
+                {
+                    b.Navigation("VehiclesLocation");
+                });
 #pragma warning restore 612, 618
         }
     }

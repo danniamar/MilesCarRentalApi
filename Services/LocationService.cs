@@ -1,67 +1,66 @@
 ﻿using DataAccess;
-using Entities;
+using MilesCarRental.Models;
 
-namespace MilesCarRental.Services
+namespace MilesCarRental.Services;
+
+public class LocationService : ILocationService
 {
-    public class LocationService : ILocationService
+    CarRentalContext context;
+
+    public LocationService(CarRentalContext dbcontext)
     {
-        CarRentalContext context;
+        context = dbcontext;
+    }
 
-        public LocationService(CarRentalContext dbcontext)
+    public IEnumerable<LocationEntity> Get()
+    {
+        return context.Locations;
+    }
+
+    public IEnumerable<LocationEntity> GetByName(string locationName)
+    {
+        return context.Locations.Where( L => L.LocationName.Contains(locationName));
+    }
+
+    public void Save(LocationEntity location)
+    {
+        context.Add(location);
+        context.SaveChanges();
+    }
+
+    public async Task Update(Guid id, LocationEntity locationUpdate)
+    {
+        var location = context.Locations.Find(id);
+
+        if (location != null)
         {
-            context = dbcontext;
-        }
+            location.LocationName = locationUpdate.LocationName;
+            location.IsOrigin = locationUpdate.IsOrigin;
+            location.IsDestination = locationUpdate.IsDestination;
+            location.Registration = DateTime.Now; 
 
-        public IEnumerable<LocationEntity> Get()
-        {
-            return context.Locations;
-        }
-
-        public IEnumerable<LocationEntity> GetByName(string locationName)
-        {
-            return context.Locations.Where( L => L.LocationName.Contains(locationName));
-        }
-
-        public void Save(LocationEntity location)
-        {
-            context.Add(location);
-            context.SaveChanges();
-        }
-
-        public async Task Update(Guid id, LocationEntity locationUpdate)
-        {
-            var location = context.Locations.Find(id);
-
-            if (location != null)
-            {
-                location.LocationName = locationUpdate.LocationName;
-                location.IsOrigin = locationUpdate.IsOrigin;
-                location.IsDestination = locationUpdate.IsDestination;
-                location.Registration = DateTime.Now; 
-
-                await context.SaveChangesAsync();
-            }
-        }
-        public async Task Delete(Guid id)
-        {
-            var currentLocation = context.Locations.Find(id);
-
-            if (currentLocation != null)
-            {
-                context.Remove(currentLocation);
-                await context.SaveChangesAsync();
-            }
+            await context.SaveChangesAsync();
         }
     }
-    public interface ILocationService
+    public async Task Delete(Guid id)
     {
-        IEnumerable<LocationEntity> Get();
-        IEnumerable<LocationEntity> GetByName(string locationName);
-        void Save(LocationEntity location);
+        var currentLocation = context.Locations.Find(id);
 
-        Task Update(Guid id, LocationEntity location);
-
-        Task Delete(Guid id);
+        if (currentLocation != null)
+        {
+            context.Remove(currentLocation);
+            await context.SaveChangesAsync();
+        }
     }
+}
+public interface ILocationService
+{
+    IEnumerable<LocationEntity> Get();
+    IEnumerable<LocationEntity> GetByName(string locationName);
+    void Save(LocationEntity location);
+
+    Task Update(Guid id, LocationEntity location);
+
+    Task Delete(Guid id);
 }
 

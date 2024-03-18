@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Entities
+namespace MilesCarRental.Models;
+
+public class LogEntity
 {
-    public class LogEntity
-    {
-        [Key]
-        public Guid LogId { get; set; }
+    [Key]
+    public Guid LogId { get; set; }
 
-        [StringLength(50)]
-        public string LocationOrigin { get; set; }
+    [StringLength(50)]
+    public string LocationOrigin { get; set; }
 
-        [StringLength(50)]
-        public string LocationDestination { get; set; }
-        public DateTime Registration { get; set; }
-    }
+    [StringLength(50)]
+    public string LocationDestination { get; set; }
+    public DateTime Registration { get; set; }
 }

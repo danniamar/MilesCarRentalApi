@@ -28,6 +28,5 @@ namespace Entities
 
         [Required]
         public bool IsAvailable { get; set; }
-        public ICollection<VehicleLocationEntity> VehiclesLocation { get; set; }
     }
 }

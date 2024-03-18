@@ -17,10 +17,10 @@ namespace MilesCarRental.Services
             return context.Logs;
         }
 
-        public async Task Save(LogEntity log)
+        public void Save(LogEntity log)
         {
             context.Add(log);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         public async Task Update(Guid id, LogEntity logUpdate)
@@ -51,7 +51,7 @@ namespace MilesCarRental.Services
     public interface ILogService
     {
         IEnumerable<LogEntity> Get();
-        Task Save(LogEntity log);
+        void Save(LogEntity log);
 
         Task Update(Guid id, LogEntity log);
 

@@ -22,10 +22,10 @@ namespace MilesCarRental.Services
             return context.Locations.Where( L => L.LocationName.Contains(locationName));
         }
 
-        public async Task Save(LocationEntity location)
+        public void Save(LocationEntity location)
         {
             context.Add(location);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         public async Task Update(Guid id, LocationEntity locationUpdate)
@@ -57,7 +57,7 @@ namespace MilesCarRental.Services
     {
         IEnumerable<LocationEntity> Get();
         IEnumerable<LocationEntity> GetByName(string locationName);
-        Task Save(LocationEntity location);
+        void Save(LocationEntity location);
 
         Task Update(Guid id, LocationEntity location);
 

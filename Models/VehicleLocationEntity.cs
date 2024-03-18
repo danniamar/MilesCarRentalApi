@@ -11,10 +11,8 @@ namespace MilesCarRental.Models
         [Required]
         public Guid LocationId { get; set; }
         public Guid LocationIdDestination { get; set; }
-        public LocationEntity Location { get; set; }
 
         [Required]
         public Guid VehicleId { get; set; }
-        public VehicleEntity Vehicle { get; set; }
     }
 }

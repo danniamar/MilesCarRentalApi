@@ -38,8 +38,10 @@ namespace MilesCarRental.Migrations
                 columns: table => new
                 {
                     LogId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    LocationOrigin = table.Column<bool>(type: "tinyint(50)", maxLength: 50, nullable: false),
-                    LocationDestination = table.Column<bool>(type: "tinyint(50)", maxLength: 50, nullable: false),
+                    LocationOrigin = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LocationDestination = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Registration = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
@@ -80,18 +82,6 @@ namespace MilesCarRental.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VehiclesLocation", x => x.VehicleLocationId);
-                    table.ForeignKey(
-                        name: "FK_VehiclesLocation_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
-                        principalColumn: "LocationId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_VehiclesLocation_Vehicles_VehicleId",
-                        column: x => x.VehicleId,
-                        principalTable: "Vehicles",
-                        principalColumn: "VehicleId",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -118,32 +108,22 @@ namespace MilesCarRental.Migrations
                 table: "VehiclesLocation",
                 columns: new[] { "VehicleLocationId", "LocationId", "LocationIdDestination", "VehicleId" },
                 values: new object[] { new Guid("ecefad67-95ed-4323-bb9b-96c0a0305027"), new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"), new Guid("00000000-0000-0000-0000-000000000000"), new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490") });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VehiclesLocation_LocationId",
-                table: "VehiclesLocation",
-                column: "LocationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VehiclesLocation_VehicleId",
-                table: "VehiclesLocation",
-                column: "VehicleId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Logs");
-
-            migrationBuilder.DropTable(
-                name: "VehiclesLocation");
-
-            migrationBuilder.DropTable(
                 name: "Locations");
 
             migrationBuilder.DropTable(
+                name: "Logs");
+
+            migrationBuilder.DropTable(
                 name: "Vehicles");
+
+            migrationBuilder.DropTable(
+                name: "VehiclesLocation");
         }
     }
 }

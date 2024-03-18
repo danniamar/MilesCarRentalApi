@@ -19,6 +19,5 @@ namespace Entities
         public bool IsOrigin { get; set; }
         public bool IsDestination { get; set; }
         public DateTime Registration { get; set; }
-        public ICollection<VehicleLocationEntity> VehiclesLocation { get; set; }
     }
 }

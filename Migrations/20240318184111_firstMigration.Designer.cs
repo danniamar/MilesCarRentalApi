@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MilesCarRental.Migrations
 {
     [DbContext(typeof(CarRentalContext))]
-    [Migration("20240318150732_firstMigration")]
+    [Migration("20240318184111_firstMigration")]
     partial class firstMigration
     {
         /// <inheritdoc />
@@ -63,13 +63,15 @@ namespace MilesCarRental.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<bool>("LocationDestination")
+                    b.Property<string>("LocationDestination")
+                        .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("tinyint(50)");
+                        .HasColumnType("varchar(50)");
 
-                    b.Property<bool>("LocationOrigin")
+                    b.Property<string>("LocationOrigin")
+                        .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("tinyint(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<DateTime>("Registration")
                         .HasColumnType("datetime(6)");
@@ -201,10 +203,6 @@ namespace MilesCarRental.Migrations
 
                     b.HasKey("VehicleLocationId");
 
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("VehicleId");
-
                     b.ToTable("VehiclesLocation");
 
                     b.HasData(
@@ -215,35 +213,6 @@ namespace MilesCarRental.Migrations
                             LocationIdDestination = new Guid("00000000-0000-0000-0000-000000000000"),
                             VehicleId = new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490")
                         });
-                });
-
-            modelBuilder.Entity("MilesCarRental.Models.VehicleLocationEntity", b =>
-                {
-                    b.HasOne("Entities.LocationEntity", "Location")
-                        .WithMany("VehiclesLocation")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entities.VehicleEntity", "Vehicle")
-                        .WithMany("VehiclesLocation")
-                        .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-
-                    b.Navigation("Vehicle");
-                });
-
-            modelBuilder.Entity("Entities.LocationEntity", b =>
-                {
-                    b.Navigation("VehiclesLocation");
-                });
-
-            modelBuilder.Entity("Entities.VehicleEntity", b =>
-                {
-                    b.Navigation("VehiclesLocation");
                 });
 #pragma warning restore 612, 618
         }

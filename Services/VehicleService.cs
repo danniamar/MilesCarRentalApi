@@ -24,10 +24,10 @@ namespace MilesCarRental.Services
             return context.Vehicles.Where(v => v.VehicleId.Equals(vehicleId)).FirstOrDefault();
         }
 
-        public async Task Save(VehicleEntity vehicle)
+        public void Save(VehicleEntity vehicle)
         {
             context.Add(vehicle);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         public async Task Update(Guid id, VehicleEntity vehicleUpdate)
@@ -63,7 +63,7 @@ namespace MilesCarRental.Services
     {
         IEnumerable<VehicleEntity> Get();
         VehicleEntity GetById(Guid vehicleId);
-        Task Save(VehicleEntity vehicle);
+        void Save(VehicleEntity vehicle);
 
         Task Update(Guid id, VehicleEntity vehicle);
 

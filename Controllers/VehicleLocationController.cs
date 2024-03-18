@@ -3,152 +3,154 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MilesCarRental.Models;
 using MilesCarRental.Services;
+using MilesCarRental.Tools;
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace MilesCarRental.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class VehicleLocationController : Controller
     {
         ILocationService locationService;
         IVehicleLocationService vehicleLocationService;
         IVehicleService vehicleService;
+        ILogService logService;
 
-        public VehicleLocationController (ILocationService locationService, IVehicleLocationService vehicleLocationService, IVehicleService vehicleService)
+        private readonly ILogger<VehicleLocationController> _logger;
+
+        public VehicleLocationController (ILocationService locationService, IVehicleLocationService vehicleLocationService, 
+            IVehicleService vehicleService, ILogService logService, ILogger<VehicleLocationController> logger)
         {
             this.locationService = locationService;
             this.vehicleLocationService = vehicleLocationService;   
             this.vehicleService = vehicleService;
-        }
+            this.logService = logService;
+            _logger = logger;
+        }      
 
-        // GET: VehicleLocationController
-        public ActionResult Index()
-        {
-            return View();
-        }
 
-        [HttpPost]
+        [HttpPost(Name = "GetVehicles")]
         public ActionResult GetVehicles([FromBody] LocationRequest locations)
         {
             List<VehicleEntity> vehicles = new List<VehicleEntity> ();
+            LocationEntity locationOrigin = null;
+            LocationEntity locationDestination = null;
 
             try
             {
-                //Validates if the locations exists
-                LocationEntity locationOrigin = locationService.GetByName(locations.LocationOrigin)
-                                                                            .First(p => p.IsOrigin == true);
-
-                LocationEntity locationDestination = locationService.GetByName(locations.LocationDestination)
-                                                                                 .First(p => p.IsDestination == true);
-
-                if (locationOrigin != null)
+                if (locations != null && !string.IsNullOrEmpty(locations.LocationOrigin)  && !string.IsNullOrEmpty(locations.LocationDestination))
                 {
-                    if (locationDestination != null)
+                    //Stores a log of the requests made in the method
+                    LogEntity log = new LogEntity();
+                    log.LogId = new Guid();
+                    log.LocationOrigin = locations.LocationOrigin;
+                    log.LocationDestination = locations.LocationDestination;
+                    log.Registration = DateTime.Now;
+
+                    logService.Save(log);
+
+                    _logger.LogDebug("Consultando las localidades");
+
+                    //Validates if the locations exists
+                    IEnumerable<LocationEntity> locationOriginList = locationService.GetByName(locations.LocationOrigin);
+                    IEnumerable<LocationEntity> locationDestinationList = locationService.GetByName(locations.LocationDestination);
+
+                    if(locationOriginList != null && locationOriginList.Count() > 0)
                     {
-                        //Obtains the vehicles associated with the locations
-                        IEnumerable<VehicleLocationEntity> vehiclesLocation = vehicleLocationService.GetByLocations(locationOrigin.LocationId, locationDestination.LocationId);
+                        locationOrigin = locationOriginList.First(p => p.IsOrigin == true);
+                    }
 
-                        //Validate if there are vehicles associated with the locations
-                        if(vehiclesLocation.Count() > 0)
+                    if (locationOriginList != null && locationOriginList.Count() > 0)
+                    {
+                        locationDestination = locationDestinationList.First(p => p.IsDestination == true);
+                    }
+
+                    if (locationOrigin != null)
+                    {
+                        if (locationDestination != null)
                         {
-                            foreach(VehicleLocationEntity vehicleLocation in vehiclesLocation)
-                            {
-                                //Get vehicle information
-                                vehicles.Add(vehicleService.GetById(vehicleLocation.VehicleId));
-                            }
+                            _logger.LogDebug("Consultando la lista de vehiculos");
+                            //Obtains the vehicles associated with the locations
+                            IEnumerable<VehicleLocationEntity> vehiclesLocation = vehicleLocationService.GetByLocations(locationOrigin.LocationId, locationDestination.LocationId);
 
-                            return Ok(vehicles);
+                            //Validate if there are vehicles associated with the locations
+                            if (vehiclesLocation.Count() > 0)
+                            {
+                                foreach (VehicleLocationEntity vehicleLocation in vehiclesLocation)
+                                {
+                                    //Get vehicle information
+                                    vehicles.Add(vehicleService.GetById(vehicleLocation.VehicleId));
+                                }
+
+                                return Ok(vehicles);
+                            }
+                        }
+                        else
+                        {
+                            //Stores information about the location of destination
+                            locationDestination = new LocationEntity();
+                            locationDestination.LocationId = new Guid();
+                            locationDestination.IsDestination = true;
+                            locationDestination.LocationName = locations.LocationDestination;
+                            locationDestination.Registration = DateTime.Now;
+
+                            locationService.Save(locationDestination);
                         }
                     }
                     else
                     {
-                        //Stores information about the location of destination
-                        LocationEntity location = new LocationEntity();
-                        location.LocationId = new Guid();
-                        location.IsDestination = true;
-                        location.LocationName = locationDestination.LocationName;
-                        location.Registration = DateTime.Now;
+                        //Stores information about the location of origin
+                        locationOrigin = new LocationEntity();
+                        locationOrigin.LocationId = new Guid();
+                        locationOrigin.IsOrigin = true;
+                        locationOrigin.LocationName = locations.LocationOrigin;
+                        locationOrigin.Registration = DateTime.Now;
 
-                        locationService.Save(location);
+                        locationService.Save(locationOrigin);
+
+                        if (locationDestination == null)
+                        {
+                            //Stores information about the location of destination
+                            locationDestination = new LocationEntity();
+                            locationDestination.LocationId = new Guid();
+                            locationDestination.IsDestination = true;
+                            locationDestination.LocationName = locations.LocationDestination;
+                            locationDestination.Registration = DateTime.Now;
+
+                            locationService.Save(locationDestination);
+                        }
                     }
-                }
-                else
-                {
-                    //Stores information about the location of origin
-                    LocationEntity location = new LocationEntity();
-                    location.LocationId = new Guid();
-                    location.IsOrigin = true;
-                    location.LocationName = locationOrigin.LocationName;
-                    location.Registration = DateTime.Now;
 
-                    locationService.Save(location);
+                    List<VehicleEntity> vehiclesBD = vehicleService.Get().ToList();
+                                      
+                    vehicles = new Utils().GenerateVehicles(vehiclesBD);
 
-                    if (locationDestination == null)
+                    foreach (VehicleEntity vehicle in vehicles)
                     {
-                        //Stores information about the location of destination
-                        location.LocationId = new Guid();
-                        location.IsDestination = true;
-                        location.LocationName = locationDestination.LocationName;
-                        location.Registration = DateTime.Now;
-
-                        locationService.Save(location);
-                    }
-                }
-
-                vehicles = GenerateVehicles(locationOrigin.LocationId, locationDestination.LocationId);
-
-                return Ok(vehicles);
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        /// <summary>
-        /// Generate a random number to obtain a random vehicle and assign it to the location
-        /// </summary>
-        /// <param name="locationOrigin"></param>
-        /// <param name="locationDestination"></param>
-        /// <returns></returns>
-        public List<VehicleEntity> GenerateVehicles(Guid locationOrigin, Guid locationDestination)
-        {
-            int count = 0;
-            List<VehicleEntity> vehicles = new List<VehicleEntity>();
-
-            IEnumerable<VehicleEntity> vehiclesBD = vehicleService.Get();
-
-            //Generates a random number of vehicles that does not exceed the maximum number of vehicles in the database
-            var randomNumber = new Random().Next(0, vehiclesBD.Count());
-
-            //
-            for(int i = 0; i < randomNumber; i++)
-            {
-                var randomVehicle = new Random().Next(0, vehiclesBD.Count());
-                count = 0;
-
-                //Tour each of the stored vehicles
-                foreach (VehicleEntity vehicle in vehiclesBD)
-                {
-                    count++;
-
-                    if (count == randomVehicle)
-                    {
-                        vehicles.Add(vehicle);
-
                         //Stores vehicles associated with the location
                         VehicleLocationEntity location = new VehicleLocationEntity();
                         location.VehicleLocationId = new Guid();
-                        location.LocationId = locationOrigin;
+                        location.LocationId = locationOrigin.LocationId;
                         location.VehicleLocationId = vehicle.VehicleId;
-                        location.LocationIdDestination = locationDestination;
+                        location.LocationIdDestination = locationDestination.LocationId;
 
                         vehicleLocationService.Save(location);
                     }
-                }
-            }
+                    
 
-            return vehicles;
+                    _logger.LogDebug("Retornando la lista de vehiculos");
+
+                }
+
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return Ok(ex.Message);
+            }
         }
     }
 }

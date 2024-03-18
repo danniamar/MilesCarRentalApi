@@ -13,10 +13,10 @@ namespace Entities
         public Guid LogId { get; set; }
 
         [StringLength(50)]
-        public bool LocationOrigin { get; set; }
+        public string LocationOrigin { get; set; }
 
         [StringLength(50)]
-        public bool LocationDestination { get; set; }
+        public string LocationDestination { get; set; }
         public DateTime Registration { get; set; }
     }
 }

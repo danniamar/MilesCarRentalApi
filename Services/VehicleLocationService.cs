@@ -24,10 +24,10 @@ namespace MilesCarRental.Services
                 .Where(v => v.VehicleLocationId.Equals(locationOrigin) && v.LocationIdDestination.Equals(locationDestination));
         }
 
-        public async Task Save(VehicleLocationEntity vehicleLocation)
+        public void Save(VehicleLocationEntity vehicleLocation)
         {
             context.Add(vehicleLocation);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         public async Task Update(Guid id, VehicleLocationEntity vehicleLocationUpdate)
@@ -58,7 +58,7 @@ namespace MilesCarRental.Services
     {
         IEnumerable<VehicleLocationEntity> Get();
         IEnumerable<VehicleLocationEntity> GetByLocations(Guid locationOrigin, Guid locationDestination);
-        Task Save(VehicleLocationEntity vehicleLocation);
+        void Save(VehicleLocationEntity vehicleLocation);
 
         Task Update(Guid id, VehicleLocationEntity vehicleLocation);
 

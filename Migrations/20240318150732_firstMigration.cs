@@ -74,6 +74,7 @@ namespace MilesCarRental.Migrations
                 {
                     VehicleLocationId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     LocationId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    LocationIdDestination = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     VehicleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
@@ -115,8 +116,8 @@ namespace MilesCarRental.Migrations
 
             migrationBuilder.InsertData(
                 table: "VehiclesLocation",
-                columns: new[] { "VehicleLocationId", "LocationId", "VehicleId" },
-                values: new object[] { new Guid("ecefad67-95ed-4323-bb9b-96c0a0305027"), new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"), new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490") });
+                columns: new[] { "VehicleLocationId", "LocationId", "LocationIdDestination", "VehicleId" },
+                values: new object[] { new Guid("ecefad67-95ed-4323-bb9b-96c0a0305027"), new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"), new Guid("00000000-0000-0000-0000-000000000000"), new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_VehiclesLocation_LocationId",

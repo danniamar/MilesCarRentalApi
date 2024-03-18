@@ -18,6 +18,12 @@ namespace MilesCarRental.Services
             return context.VehiclesLocation;
         }
 
+        public IEnumerable<VehicleLocationEntity> GetByLocations(Guid locationOrigin, Guid locationDestination)
+        {
+            return context.VehiclesLocation
+                .Where(v => v.VehicleLocationId.Equals(locationOrigin) && v.LocationIdDestination.Equals(locationDestination));
+        }
+
         public async Task Save(VehicleLocationEntity vehicleLocation)
         {
             context.Add(vehicleLocation);
@@ -51,6 +57,7 @@ namespace MilesCarRental.Services
     public interface IVehicleLocationService
     {
         IEnumerable<VehicleLocationEntity> Get();
+        IEnumerable<VehicleLocationEntity> GetByLocations(Guid locationOrigin, Guid locationDestination);
         Task Save(VehicleLocationEntity vehicleLocation);
 
         Task Update(Guid id, VehicleLocationEntity vehicleLocation);

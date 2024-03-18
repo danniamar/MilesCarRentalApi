@@ -190,6 +190,9 @@ namespace MilesCarRental.Migrations
                     b.Property<Guid>("LocationId")
                         .HasColumnType("char(36)");
 
+                    b.Property<Guid>("LocationIdDestination")
+                        .HasColumnType("char(36)");
+
                     b.Property<Guid>("VehicleId")
                         .HasColumnType("char(36)");
 
@@ -206,6 +209,7 @@ namespace MilesCarRental.Migrations
                         {
                             VehicleLocationId = new Guid("ecefad67-95ed-4323-bb9b-96c0a0305027"),
                             LocationId = new Guid("b29f780f-c2fc-41e0-a5e5-dab0090a4f09"),
+                            LocationIdDestination = new Guid("00000000-0000-0000-0000-000000000000"),
                             VehicleId = new Guid("0c4c3455-4330-4e35-b0a7-9ec7e42c6490")
                         });
                 });
